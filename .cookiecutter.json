@@ -1,0 +1,14 @@
+{
+  "_output_dir": "C:\\Users\\adity\\OneDrive\\Desktop\\workspace",
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Aditya Prakash",
+  "copyright_year": "2023",
+  "development_status": "Development Status :: 2 - Pre-Alpha",
+  "email": "adityaprakash.work@gmail.com",
+  "friendly_name": "Tattva",
+  "github_user": "adityaprakash-work",
+  "license": "Apache-2.0",
+  "package_name": "tattva",
+  "project_name": "tattva",
+  "version": "0.1.0"
+}
