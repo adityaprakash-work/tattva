@@ -35,7 +35,10 @@
 
 ## Requirements
 
+- Python 3.x
 - Jax
+- NumPy
+- SciPy
 
 ## Installation
 
@@ -44,7 +47,10 @@ You can install _Tattva_ via [pip] from [PyPI]:
 ```console
 $ pip install tattva
 ```
-
+or alternatively, 
+```console
+$ pip install git+https://github.com/adityaprakash-work/tattva.git
+```
 ## Usage
 
 Please see the [Command-line Reference] for details.
