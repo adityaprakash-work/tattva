@@ -23,11 +23,22 @@
 
 ## Features
 
-- TODO
+- Supports arbitrary dimensions and channel numbers for cellular automata simulations
+- Utilizes Jax for GPU acceleration to speed up simulations
+- Supports FFT convolution for larger simulations
+- Provides an intuitive interface for setting up and running simulations
+- Includes a variety of pre-built rules and configurations for easy experimentation
+- Offers the ability to customize rules and configurations for more advanced users
+- Supports visualization of simulations in real-time or via saved images and videos
+- Includes tools for analyzing simulation data and generating statistics
+- Provides extensive documentation and a community forum for support and collaboration
 
 ## Requirements
 
-- TODO
+- Python 3.x
+- Jax
+- NumPy
+- SciPy
 
 ## Installation
 
@@ -36,7 +47,10 @@ You can install _Tattva_ via [pip] from [PyPI]:
 ```console
 $ pip install tattva
 ```
-
+or alternatively, 
+```console
+$ pip install git+https://github.com/adityaprakash-work/tattva.git
+```
 ## Usage
 
 Please see the [Command-line Reference] for details.
