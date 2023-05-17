@@ -11,8 +11,7 @@ import jax.numpy as jnp
 
 # ---BASE AUTOMATA--------------------------------------------------------------
 class BaseAutomaton:
-    def __init__(self, grid_shape: tuple):
-        self.grid_shape = grid_shape
+    def __init__(self):
         self.grid = None
 
     def init_grid(self, grid):
