@@ -14,11 +14,11 @@ from ..utils import maths
 
 # ---CONWAY'S GAME OF-----------------------------------------------------------
 class ConwayGOL(BaseAutomaton):
-    def __init__(self, grid_shape: tuple, grid_0: jnp.array, dt: float):
+    def __init__(self, grid_shape: tuple, grid_0: jnp.array, dt: float = 0.1):
         super().__init__(grid_shape)
         self.kernel = jnp.array([[[1], [1], [1]], [[1], [0], [1]], [[1], [1], [1]]])
         self.init_grid(grid_0)
-        self.dt = 0.1
+        self.dt = dt
         self.growth_func = jit(lambda U: 0 + (U == 3) - ((U < 2) | (U > 3)))
         self.call_dict = {
             "cpadding": ttvl.CircularPadding((self.kernel.shape)),
