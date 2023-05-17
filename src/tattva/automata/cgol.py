@@ -16,13 +16,15 @@ from ..utils import maths
 class ConwayGOL(BaseAutomaton):
     def __init__(self, grid_0: jnp.array, dt: float = 0.1):
         super().__init__()
-        self.kernel = jnp.array([[[1], [1], [1]], [[1], [0], [1]], [[1], [1], [1]]])
+        self.kernels = jnp.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]]).reshape(
+            (1, 3, 3, 1)
+        )
         self.init_grid(grid_0)
         self.dt = dt
         self.growth_func = jit(lambda U: 0 + (U == 3) - ((U < 2) | (U > 3)))
         self.call_dict = {
             "cpadding": ttvl.CircularPadding((self.kernel.shape)),
-            "cgolrule": ttvl.Potential(self.kernel, method="direct"),
+            "cgolrule": ttvl.Potential(self.kernels, method="direct"),
             "cgolgrow": ttvl.Growth(self.growth_func, self.dt, maths.hardclip),
         }
 
