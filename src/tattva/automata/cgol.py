@@ -23,7 +23,7 @@ class ConwayGOL(BaseAutomaton):
         self.dt = dt
         self.growth_func = jit(lambda U: 0 + (U == 3) - ((U < 2) | (U > 3)))
         self.call_dict = {
-            "cpadding": ttvl.CircularPadding((self.kernels.shape)),
+            "cpadding": ttvl.CircularPadding((self.kernels[0].shape)),
             "cgolrule": ttvl.Potential(self.kernels, method="direct"),
             "cgolgrow": ttvl.Growth(self.growth_func, self.dt, maths.hardclip),
         }

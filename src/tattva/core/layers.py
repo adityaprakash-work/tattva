@@ -67,8 +67,8 @@ class CircularPadding:
         if len(input_array.shape) != len(self.kernel_shape):
             raise ValueError(
                 f"Expected input array with {len(self.kernel_shape)}"
-                f" dimensions, but got array with {len(input_array.shape)}"
-                "dimensions"
+                f" axes, but got array with {len(input_array.shape)}"
+                " axes"
             )
 
         padded_array = jnp.pad(input_array, self.pad_width, mode="wrap")
