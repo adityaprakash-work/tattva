@@ -10,6 +10,7 @@
 #   with those values.
 # --'_convmet' can be pre-jitted although it's getting jitted internally in
 #  '__call__', compare performance differences.
+# --A thorough benchmarking for channel-first vs channel-last convolutions
 
 from functools import partial
 
@@ -122,7 +123,9 @@ class Potential:
         # \Guard clause
 
         v_convmet = vmap(self._convmet, (0, None))
-        potential_distribution = v_convmet(self.kernels, input_array)
+        potential_distribution = jnp.concatenate(
+            v_convmet(self.kernels, input_array), axis=-1
+        )
 
         return potential_distribution
 
@@ -161,8 +164,7 @@ class Growth:
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array, potential_distribution):
         # /Guard clause
-        with EXGU(EXER, 1) as c:
-            c(len(potential_distribution.shape) == 2)
+        # None
         # \Guard clause
 
         dg = self.dt * self.growth_function(potential_distribution)
@@ -188,19 +190,16 @@ class Aggregate:
         Performs weighted aggregation of the input array along the last axis.
     """
 
-    def __init__(self, weights: tuple):
+    def __init__(self, weights: jnp.array):
         self.weights = weights
 
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
         # /Guard clause
-        with EXGU(EXER, 1) as c:
-            c(input_array.shape[-1] == len(self.weights))
+        # None
         # \Guard clause
 
-        out = input_array
-        for i, w in enumerate(self.weights):
-            out = out.at[..., i].multiply(w)
-        out = jnp.sum(out, axis=len(out.shape) - 1)
+        out = jnp.einsum("...i,i->...", input_array, self.weights)
+        out = jnp.sum(out, axis=-1)
 
         return out
