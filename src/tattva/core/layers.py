@@ -12,14 +12,13 @@
 #  '__call__', compare performance differences.
 # --A thorough benchmarking for channel-first vs channel-last convolutions
 
-from functools import partial
-
-
 # ---DEPENDENCIES---------------------------------------------------------------
 import jax.numpy as jnp
 import jax.scipy as jsp
 from jax import jit
 from jax import vmap
+
+from functools import partial
 
 from ..utils.guards import ExpectationError as EXER
 from ..utils.guards import ExpectationGuard as EXGU
