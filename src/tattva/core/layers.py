@@ -10,6 +10,10 @@
 #   with those values.
 # --'_convmet' can be pre-jitted although it's getting jitted internally in
 #  '__call__', compare performance differences.
+# --A thorough benchmarking for channel-first vs channel-last convolutions
+
+from functools import partial
+
 
 # ---DEPENDENCIES---------------------------------------------------------------
 import jax.numpy as jnp
@@ -17,7 +21,8 @@ import jax.scipy as jsp
 from jax import jit
 from jax import vmap
 
-from functools import partial
+from ..utils.guards import ExpectationError as EXER
+from ..utils.guards import ExpectationGuard as EXGU
 
 from ..utils.guards import ExpectationError as EXER
 from ..utils.guards import ExpectationGuard as EXGU
@@ -162,6 +167,7 @@ class Growth:
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array, potential_distribution):
         # /Guard clause
+        # None
         # \Guard clause
 
         dg = self.dt * self.growth_function(potential_distribution)
@@ -193,6 +199,10 @@ class Aggregate:
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
         # /Guard clause
+        # None
+        # \Guard clause
+
+        out = jnp.einsum("...i,i->...", input_array, self.weights)
         # \Guard clause
 
         out = input_array
