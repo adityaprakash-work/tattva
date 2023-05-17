@@ -14,8 +14,8 @@ from ..utils import maths
 
 # ---CONWAY'S GAME OF-----------------------------------------------------------
 class ConwayGOL(BaseAutomaton):
-    def __init__(self, grid_shape: tuple, grid_0: jnp.array, dt: float = 0.1):
-        super().__init__(grid_shape)
+    def __init__(self, grid_0: jnp.array, dt: float = 0.1):
+        super().__init__()
         self.kernel = jnp.array([[[1], [1], [1]], [[1], [0], [1]], [[1], [1], [1]]])
         self.init_grid(grid_0)
         self.dt = dt
