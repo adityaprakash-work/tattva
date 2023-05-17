@@ -14,6 +14,7 @@
 
 from functools import partial
 
+
 # ---DEPENDENCIES---------------------------------------------------------------
 import jax.numpy as jnp
 import jax.scipy as jsp
@@ -23,6 +24,8 @@ from jax import vmap
 from ..utils.guards import ExpectationError as EXER
 from ..utils.guards import ExpectationGuard as EXGU
 
+from ..utils.guards import ExpectationError as EXER
+from ..utils.guards import ExpectationGuard as EXGU
 
 # ---CONSTANTS------------------------------------------------------------------
 
@@ -200,6 +203,11 @@ class Aggregate:
         # \Guard clause
 
         out = jnp.einsum("...i,i->...", input_array, self.weights)
+        # \Guard clause
+
+        out = input_array
+        for i, w in enumerate(self.weights):
+            out = out.at[..., i].multiply(w)
         out = jnp.sum(out, axis=-1)
 
         return out
