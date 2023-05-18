@@ -13,3 +13,4 @@ from .base import BaseAutomaton
 class Lenia(BaseAutomaton):
     def __init__(self, grid_shape: tuple):
         super(Lenia, self).__init__(grid_shape)
+
