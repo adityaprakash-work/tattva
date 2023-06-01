@@ -114,10 +114,13 @@ class Potential:
     def __call__(self, input_array: jnp.array):
         if self.depthwise:
             v_convmet = vmap(self._convmet, in_axes=(-1, 0), out_axes=-1)
+            potential_distribution = v_convmet(input_array, self.kernels)
+            return potential_distribution
         else:
             v_convmet = vmap(self._convmet, in_axes=(None, 0), out_axes=-1)
-        potential_distribution = v_convmet(input_array, self.kernels)
-        return potential_distribution
+            potential_distribution = v_convmet(input_array, self.kernels)
+            potential_distribution = jnp.squeeze(potential_distribution, axis=-2)
+            return potential_distribution
 
 
 class Growth:
