@@ -23,8 +23,6 @@ from functools import partial
 from ..utils.guards import ExpectationError as EXER
 from ..utils.guards import ExpectationGuard as EXGU
 
-from ..utils.guards import ExpectationError as EXER
-from ..utils.guards import ExpectationGuard as EXGU
 
 # ---CONSTANTS------------------------------------------------------------------
 
@@ -105,10 +103,6 @@ class Potential:
     """
 
     def __init__(self, kernels: jnp.array, method: str = "fft"):
-        # /Guard clause
-        # None
-        # \Guard clause
-
         self.kernels = kernels
         self.method = method
 
@@ -120,10 +114,6 @@ class Potential:
 
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
-        # /Guard clause
-        # None
-        # \Guard clause
-
         v_convmet = vmap(self._convmet, (0, None))
         potential_distribution = jnp.concatenate(
             v_convmet(self.kernels, input_array), axis=-1
@@ -165,10 +155,6 @@ class Growth:
 
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array, potential_distribution):
-        # /Guard clause
-        # None
-        # \Guard clause
-
         dg = self.dt * self.growth_function(potential_distribution)
         out = jnp.add(input_array, dg)
         out = self.clip_function(out)
@@ -197,13 +183,7 @@ class Aggregate:
 
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
-        # /Guard clause
-        # None
-        # \Guard clause
-
         out = jnp.einsum("...i,i->...", input_array, self.weights)
-        # \Guard clause
-
         out = input_array
         for i, w in enumerate(self.weights):
             out = out.at[..., i].multiply(w)
