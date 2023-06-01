@@ -162,6 +162,39 @@ class Growth:
         return out
 
 
+class Target:
+    """
+    Growth based system cab be fromulated as,
+
+    u(x, t + dt) = clip([u(x, t) + dtG(K ∗ u)]])
+
+    where K ∗ u is a non-local kernel convolution, clip is a clipping function
+    and G is a reaction term.
+
+    An asymptotic variant can be formulated as,
+
+    u(x, t + dt) = u(x, t) + dt(T(K ∗ u) - u(x, t))
+
+    where T is a reaction term and is usually constructed from the reaction term
+    G in a Growth based system as T = (G + 1)/2. THis does not include the clipping
+    procedure. This allows the equation to be transformed into a differential equation
+    of the form,
+
+    du(x, t)/dt = T(K ∗ u) - u
+    """
+
+    def __init__(self, target_function, dt: float):
+        self.target_function = target_function
+        self.dt = dt
+
+    @partial(jit, static_argnums=(0))
+    def __call__(self, input_array: jnp.array, potential_distribution):
+        dtr = self.dt * (self.target_function(potential_distribution) - input_array)
+        out = jnp.add(input_array, dtr)
+
+        return out
+
+
 class Aggregate:
     """
     Performs aggregation of a multi-dimensional input array.
@@ -169,9 +202,7 @@ class Aggregate:
     Attributes:
     ----------
     weights (tuple):
-        A tuple of weights used for aggregation. The sum of the weights can be
-        set to 1 for a weighted aggregation and all 1s for a summation.
-
+        A tuple of weights used for aggregation.
     Methods:
     -------
     __call__(input_array):
@@ -184,9 +215,5 @@ class Aggregate:
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
         out = jnp.einsum("...i,i->...", input_array, self.weights)
-        out = input_array
-        for i, w in enumerate(self.weights):
-            out = out.at[..., i].multiply(w)
-        out = jnp.sum(out, axis=-1)
 
         return out
