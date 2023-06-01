@@ -70,43 +70,41 @@ class CircularPadding:
             )
 
         padded_array = jnp.pad(input_array, self.pad_width, mode="wrap")
-
         return padded_array
 
 
 class Potential:
     """
-    Represents a potential function that applies a convolution operation on a
-    given input array.
+    A class for calculating the potential distribution of a CA.
 
     Attributes:
-    -----------
-    kernel : jnp.array
-        The kernel used for the convolution operation.
+    ----------
+    kernels : jnp.array
+        A 3D array of kernels used for calculating the potential distribution.
+    method : str
+        The method used for calculating the potential distribution. Either
+        'fft' or 'direct'.
+    depthwise : bool
+        A boolean value indicating whether the kernels are depthwise or not.
 
     Methods:
-    --------
-
-    __call__(input_array: jnp.array) -> jnp.array:
-        Applies the convolution operation on the input_array using the kernel
-        attribute and returns the potential distribution.
-
-        Parameters:
-        -----------
-        input_array : jnp.array
-            The input array to apply the convolution operation on.
-
-        Returns:
-        --------
-        jnp.array:
-            The potential distribution resulting from the convolution operation.
+    -------
+    __call__(self, input_array):
+        Applies the convolution method to the input array using the kernels and
+        returns the potential distribution.
     """
 
-    def __init__(self, kernels: jnp.array, method: str = "fft"):
-        self.kernels = kernels
+    def __init__(
+        self, kernels: jnp.array, method: str = "fft", depthwise: bool = False
+    ):
         self.method = method
+        self.depthwise = depthwise
+        if self.depthwise:
+            self.kernels = jnp.squeeze(kernels, axis=-1)
+        else:
+            self.kernels = kernels
 
-    def _convmet(self, kernel: jnp.array, input_array: jnp.array):
+    def _convmet(self, input_array: jnp.array, kernel: jnp.array):
         if self.method == "fft":
             return jsp.signal.fftconvolve(input_array, kernel, mode="valid")
         elif self.method == "direct":
@@ -114,11 +112,11 @@ class Potential:
 
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
-        v_convmet = vmap(self._convmet, (0, None))
-        potential_distribution = jnp.concatenate(
-            v_convmet(self.kernels, input_array), axis=-1
-        )
-
+        if self.depthwise:
+            v_convmet = vmap(self._convmet, in_axes=(-1, 0), out_axes=-1)
+        else:
+            v_convmet = vmap(self._convmet, in_axes=(None, 0), out_axes=-1)
+        potential_distribution = v_convmet(input_array, self.kernels)
         return potential_distribution
 
 
@@ -158,7 +156,6 @@ class Growth:
         dg = self.dt * self.growth_function(potential_distribution)
         out = jnp.add(input_array, dg)
         out = self.clip_function(out)
-
         return out
 
 
@@ -191,7 +188,6 @@ class Target:
     def __call__(self, input_array: jnp.array, potential_distribution):
         dtr = self.dt * (self.target_function(potential_distribution) - input_array)
         out = jnp.add(input_array, dtr)
-
         return out
 
 
@@ -215,5 +211,4 @@ class Aggregate:
     @partial(jit, static_argnums=(0))
     def __call__(self, input_array: jnp.array):
         out = jnp.einsum("...i,i->...", input_array, self.weights)
-
         return out
