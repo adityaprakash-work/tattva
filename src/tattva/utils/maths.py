@@ -1,5 +1,15 @@
+# ---INFO-----------------------------------------------------------------------
+
+# --Authors        |Last Updated |tattva-utils-maths
+# --Aditya Prakash |01-06-2023   |stable
+
+# --Needed
+# --jnp implementation of gaussian_kernel doesn't work, equivalent np version
+#   works fine. Check if it's a bug or something else.
+
 # ---DEPENDENCIES---------------------------------------------------------------
 import jax.numpy as jnp
+import numpy as np
 from jax import jit
 
 
@@ -49,3 +59,32 @@ def softclip(input_array: jnp.array):
     """
 
     return 1 / (1 + jnp.exp(-4 * (input_array - 0.5)))
+
+
+def gaussian_kernel(meu: list, sigma: list, radius: int, ndim: int):
+    """
+    Generates a Gaussian kernel of specified shape.
+
+    Args:
+        meu: A list of mean values for each dimension.
+        sigma: A list of standard deviation values for each dimension.
+        radius: The radius of the kernel.
+        ndim: The number of dimensions of the kernel.
+
+    Returns:
+        A NumPy array of the specified shape, containing the Gaussian kernel.
+
+    The Gaussian kernel is defined as:
+
+        K = exp(-(((x - meu) / sigma)^2) / 2)
+
+    where x is the distance from the center of the kernel, meu is the mean
+    value, and sigma is the standard deviation.
+    """
+
+    bell = lambda x, m, s: np.exp(-(((x - m) / s) ** 2) / 2)
+    grid = np.ogrid[[slice(-radius, radius)] * ndim]
+    D = np.linalg.norm(np.asarray(grid) + 1) / radius
+    K = sum([(D < 1) * bell(D, m, s) for m, s in zip(meu, sigma)])
+    K = K / np.sum(K)
+    return jnp.array(K)

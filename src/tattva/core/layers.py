@@ -170,7 +170,7 @@ class Target:
 
     An asymptotic variant can be formulated as,
 
-    u(x, t + dt) = u(x, t) + dt(T(K ∗ u) - u(x, t))
+    u(x, t + dt) = u(x, t) + dt(T(K ∗ u) - u)
 
     where T is a reaction term and is usually constructed from the reaction term
     G in a Growth based system as T = (G + 1)/2. THis does not include the clipping
